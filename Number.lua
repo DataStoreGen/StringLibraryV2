@@ -202,11 +202,11 @@ end
 function Number.Concat(value, canNotation: number?, canRound: boolean?)
 	canNotation = canNotation or 1e6
 	canRound = canRound or true
-	if Number.meeq(value, canNotation) then
+	if value >= canNotation then
 		return Number.toNotation(value, canRound)
-	elseif Number.meeq(value, 1e6) and Number.leeq(value, canNotation) and canRound then
+	elseif value >= 1e6 and value <= canNotation and canRound then
 		return Number.short(value, canRound)
-	elseif Number.le(value, 1e6) then
+	elseif value <= 1e6 then
 		return Number.Comma(value)
 	end
 end
