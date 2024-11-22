@@ -224,6 +224,7 @@ function Number.GetValue(valueName, Player: Player)
 	return self
 end
 
+
 type labels = TextLabel|TextButton
 function Number:OnChanged(callBack: (property: string, canNotation: number?, canRound: boolean?) -> (), label: labels?, canNotation: number?, canRound: boolean?)
 	canRound = canRound or true
