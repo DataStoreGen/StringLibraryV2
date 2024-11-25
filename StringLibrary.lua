@@ -216,6 +216,45 @@ function st.pow2(val1, val2): string
 	return st.pow(val1, st.pow(val1, val2))
 end
 
+function st.lbencode(value)
+	local toTable = st.correct(value)
+	local man, exp = toTable[1], toTable[2]
+	if man == 0 then return 4e18 end
+	local mode = 0
+	if man < 0 then
+		mode = 1
+	elseif man > 0 then
+		mode = 2
+	end
+	local val = mode * 1e18
+	if mode == 2 then
+		val += (exp * 1e14) + (math.log10(math.abs(man))*1e13)
+	elseif mode == 1 then
+		val += (exp * 1e14) + (math.log10(math.abs(man))*1e13)
+		val = 1e17 - val
+	end
+	return val
+end
+
+function st.lbdecode(value)
+	if value == 4e18 then
+		return st.new(0, 0)
+	end
+	local mode = math.floor(value / 1e18)
+	if mode == 1 then
+		local v = 1e18 - value
+		local exp = math.floor(v / 1e14)
+		local man = 10 ^ ((v % 1e14) / 1e13)
+		return st.new(-man, exp)
+	elseif mode == 2 then
+		local v = value - 2e18
+		local exp = math.floor(v / 1e14)
+		local man = 10 ^ ((v % 1e14) / 1e13)
+		return st.new(man, exp)
+	end
+	return st.new(math.huge, math.huge)
+end
+
 function st.AddComma(num1: number): string
 	local function formatNumber(num)
 		return tostring(num):reverse():gsub("(%d%d%d)", "%1,"):reverse():gsub("^,", "")
@@ -320,35 +359,7 @@ function st.max(c, b, r, k) -- max buy
 	return max, cost, nextCost
 end
 
-function st.Numshort(value, canRound: boolean?): string
-	return Number.short(value, canRound)
-end
-
-function st.NumComma(value: number): string
-	return Number.Comma(value)
-end
-
-function st.NumCtS(value, canRound: boolean?)
-	if cr.meeq(value, 1e9) then
-		return st.Numshort(value, canRound)
-	end
-	return st.NumComma(value)
-end
-
-function st.toScience(value)
-	return st.toStr(st.correct(value))
-end
-
-function st.NumStE(value, canNotation: number?, canRound: boolean?)
-	return Number.shortE(value, canNotation, canRound)
-end
-
-function st.NumConcat(value, canNotation: number?, canRound: boolean?)
-	return Number.Concat(value, canNotation, canRound)
-end
-
-function st.TimeUpdate(value)
-	return Number.CorrectTime(value)
-end
-
-return st
+return {
+	n = Number,
+	s = st
+}
